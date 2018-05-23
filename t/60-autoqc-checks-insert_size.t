@@ -22,6 +22,7 @@ my $repos = catfile($current_dir, q[t/data/autoqc]);
 my $ref = catfile($repos, q[references]);
 my $format = q[sam];
 my $test_bam = 0;
+my $norm_fit = `which norm_fit`;
 
 use_ok('npg_qc::autoqc::results::insert_size');
 use_ok('npg_qc::autoqc::checks::insert_size');
@@ -41,8 +42,7 @@ sub _additional_modules {
   if ($use_fastx) {
     push @expected, q[FASTX Toolkit fastx_reverse_complement 0.0.12];
   }
-  push @expected, join(q[ ], abs_path(join(q[/], $current_dir, q[blib/script/norm_fit])),
-    $npg_qc::autoqc::results::insert_size::VERSION);
+  push @expected, $norm_fit, $npg_qc::autoqc::results::insert_size::VERSION;
   return @expected;
 }
 
