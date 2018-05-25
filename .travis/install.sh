@@ -16,7 +16,6 @@ WTSI_NPG_BUILD_BRANCH=${WTSI_NPG_BUILD_BRANCH:=$TRAVIS_BRANCH}
 IRODS_RIP_DIR=${IRODS_RIP_DIR:+$IRODS_RIP_DIR}
 
 sudo apt-get install libgd2-xpm-dev # For npg_tracking
-sudo apt-get install liblzma-dev # For npg_qc
 
 # CPAN as in npg_npg_deploy
 cpanm --notest --reinstall App::cpanminus
@@ -39,30 +38,8 @@ cd /tmp/disposable-irods-${DISPOSABLE_IRODS_VERSION}
 ./scripts/install_irods.sh
 ./scripts/configure_irods.sh
 
-# Jansson
-wget -q https://github.com/akheron/jansson/archive/v${JANSSON_VERSION}.tar.gz -O /tmp/jansson-${JANSSON_VERSION}.tar.gz
-tar xfz /tmp/jansson-${JANSSON_VERSION}.tar.gz -C /tmp
-cd /tmp/jansson-${JANSSON_VERSION}
-autoreconf -fi
-./configure ; make ; sudo make install
-sudo ldconfig
-
 # baton
-wget -q https://github.com/wtsi-npg/baton/releases/download/${BATON_VERSION}/baton-${BATON_VERSION}.tar.gz -O /tmp/baton-${BATON_VERSION}.tar.gz
-tar xfz /tmp/baton-${BATON_VERSION}.tar.gz -C /tmp
-cd /tmp/baton-${BATON_VERSION}
-
-IRODS_HOME=
-baton_irods_conf="--with-irods"
-
-if [ -n "$IRODS_RIP_DIR" ]
-then
-    export IRODS_HOME="$IRODS_RIP_DIR/iRODS"
-    baton_irods_conf="--with-irods=$IRODS_HOME"
-fi
-
-./configure ${baton_irods_conf} ; make ; sudo make install
-sudo ldconfig
+conda install --name "$CONDA_TEST_ENV" baton
 
 # WTSI NPG Perl repo dependencies
 repos=""
