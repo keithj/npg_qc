@@ -65,7 +65,6 @@ jobs:
           conda install -y -n "$CONDA_TEST_ENV" npg_qc_utils
           conda install -y -n "$CONDA_TEST_ENV" baton
       env:
-        CONDA_CHANNEL: https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic
         CONDA_TEST_ENV: test-environment
 
     - name: install cpanm
