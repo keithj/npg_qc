@@ -17,10 +17,12 @@ jobs:
         shell: bash -l -e -o pipefail {0}
 
     env:
-      WSI_CONDA_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic"
       NPM_CONFIG_PREFIX: "$HOME/.npm-global"
+      DEVEL_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/devel/generic"
+      PROD_CHANNEL: "https://dnap.cog.sanger.ac.uk/npg/conda/prod/generic"
 
-    name: Perl ${{ matrix.perl }} and Node ${{ matrix.node }} and NPM ${{ matrix.npm }} on ${{ matrix.os }}
+
+    name:   Perl ${{ matrix.perl }} and Node ${{ matrix.node }} and NPM ${{ matrix.npm }} on ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
 
@@ -31,6 +33,19 @@ jobs:
       with:
         path: ~/perl5ext
         key: ${{ matrix.os }}-build-cpanm-external
+
+    - name: Choose Conda channel
+      run: |
+        chan=${{ (endsWith(github.ref, 'master') && env.PROD_CHANNEL) ||
+                  env.DEVEL_CHANNEL }}
+        echo "CONDA_CHANNEL=${chan}" >> $GITHUB_ENV
+
+        #chan=${{ (endsWith(github.ref, 'master') && 'prod') || 'devel' }}
+        #echo "CONDA_CHANNEL=https://dnap.cog.sanger.ac.uk/npg/conda/${chan}/generic" >> $GITHUB_ENV
+
+    - name: Debug ref ${{ github.ref }}
+      run: |
+        echo GitHub ref is $GITHUB_REF
 
     - name: Initialize Miniconda
       run: |
@@ -56,7 +71,7 @@ jobs:
           conda config --prepend envs_dirs ~/conda/envs
 
           conda config --set auto_update_conda False
-          conda config --prepend channels "$WSI_CONDA_CHANNEL"
+          conda config --prepend channels "$CONDA_CHANNEL"
           conda config --append channels conda-forge
           conda info
 
